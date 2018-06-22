@@ -48,8 +48,8 @@ function aes256CbcDecrypt(iv, key, ciphertext) {
 
 function aes128CbcDecrypt(iv, key, ciphertext) {
 
-  console.log("chiper:",ciphertext);
-  console.log("iv:",iv);
+  // console.log("chiper:",ciphertext);
+  // console.log("iv:",iv);
 
   var cipher = crypto.createDecipheriv("AES-128-CTR", key, iv);
 
@@ -88,19 +88,24 @@ function equalConstTime(b1, b2) {
 function derive(privateKeyA, publicKeyB) {
   return new Promise(function(resolve) {
 
+
+
     var sjcl = require('sjcl-all');
     var mykey = privateKeyA.toString('hex');
     var pubkey = publicKeyB.toString('hex');
     var secret_key_bn = new sjcl.bn(mykey);
+
     var secret_key = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.k256, secret_key_bn);
+
     var pub = new sjcl.ecc.elGamal.publicKey(
         sjcl.ecc.curves.k256,
         sjcl.codec.hex.toBits(pubkey.slice(2))
     );
+
     resolve(new Buffer(sjcl.codec.hex.fromBits( secret_key.dhJavaEc(pub)),'hex' ));
 
-    // console.log("DH Pub: ",publicKeyB.toString('hex'));
-    // console.log("DH Priv:",privateKeyA.toString('hex'));
+      // console.log("DH Pub: ",publicKeyB.toString('hex'));
+     // console.log("DH Priv:",privateKeyA.toString('hex'));
     // resolve(secp256k1.ecdh(publicKeyB, privateKeyA));
 
 
@@ -165,7 +170,7 @@ exports.encrypt = function(publicKeyTo, msg, opts) {
  */
 exports.decrypt = function(privateKey, opts) {
   return derive(privateKey, opts.ephemPublicKey).then(function(Px) {
-    console.log("px:",Px.toString('hex'));
+    // console.log("px:",Px.toString('hex'));
     var kdfHash = crypto.createHash("sha256");
     // let ctrs = [(ctr >> 24) as u8, (ctr >> 16) as u8, (ctr >> 8) as u8, ctr as u8];
     // hasher.input(&ctrs);
@@ -196,7 +201,7 @@ exports.decrypt = function(privateKey, opts) {
       opts.ciphertext, new Buffer('0000','hex')
     ]);
     var realMac = hmacSha256(macKey, dataToMac);
-    console.log(realMac,opts.mac);
+    // console.log(realMac,opts.mac);
     assert(equalConstTime(opts.mac, realMac), "Bad MAC");
     return aes128CbcDecrypt(opts.iv, encryptionKey, opts.ciphertext);
     // return true;

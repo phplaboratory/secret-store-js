@@ -1,0 +1,13 @@
+{
+  "name": "secret-store-js",
+  "version": "0.0.1",
+  "dependencies": {
+    "bitcore-lib": "^0.15.0",
+    "bluebird": "^3.5.1",
+    "crypto": "^1.0.1",
+    "ethereumjs-util": "^5.2.0",
+    "secp256k1": "^3.5.0",
+    "sjcl-all": "^1.0.1",
+    "sync-request": "^6.0.0"
+  }
+}
