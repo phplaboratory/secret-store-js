@@ -12,7 +12,8 @@ const ecies = require('./ecies_taras.js');
 
 
 
-const ss_url="http://94.130.94.162:8082";
+//const ss_url="http://94.130.94.162:8082";
+const ss_url="http://94.130.94.162:8083";
 
 
 
@@ -23,12 +24,12 @@ console.log('Private key:',hdPrivateKey.toString());
 
 
 /* Step 2 */
-var derivedByArgument = hdPrivateKey.derive("m/44'/60'/0'/0");
+var derivedByArgument = hdPrivateKey.derive("m/44'/60'/0'/3");
 console.log("Private key A:",derivedByArgument.privateKey.toString('hex'));
 const privateKey = Buffer.from(derivedByArgument.privateKey.toString('hex'), 'hex'); // key used for request
 
 /* Step 3 */
-console.log('Address','0x'+utils.privateToAddress(privateKey).toString('hex'));
+console.log('Address A','0x'+utils.privateToAddress(privateKey).toString('hex'));
 
 /* Step 4 */
 //var hdPrivateKeyBoxItems = [  (new HDPrivateKey()).toBuffer(),(new HDPrivateKey()).toBuffer() ];
@@ -87,6 +88,8 @@ var hdPrivateKeyBoxItem =   (new HDPrivateKey()).toBuffer() ;
 var derivedByArgumentB = hdPrivateKey.derive("m/44'/60'/0'/1");
 console.log("Private key B:",derivedByArgumentB.privateKey.toString('hex'));
 const privateKeyB = Buffer.from(derivedByArgumentB.privateKey.toString('hex'), 'hex'); // key used for request
+console.log('Address B','0x'+utils.privateToAddress(privateKeyB).toString('hex'));
+
 var signedStorageId_B = secp256k1.sign(storageId, privateKeyB);
 
 
