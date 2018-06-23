@@ -1,5 +1,6 @@
 'use strict';
 
+
 var Promise = require('bluebird');
 var secp256k1 = require('secp256k1/elliptic');
 var crypto = require('crypto');
@@ -207,5 +208,25 @@ exports.decrypt = function(privateKey, opts) {
     // return true;
   });
 };
+
+/**
+ * Decrypt response from Secret Store (parity)
+ * @param {Buffer} privateKey - A 32-byte private key of recepient of
+ * the mesage
+ * @param {Sting} data - hex encoded string
+ * @return {Promise.<Buffer>} - A promise that resolves with the
+ * plaintext on successful decryption and rejects on failure.
+ */
+
+exports.decrypt_SecretStore= function(privateKey,data) {
+    let encrypted_document_key_buffer = new Buffer(data, 'hex');
+    let clen = encrypted_document_key_buffer.length - 32;
+    return exports.decrypt(privateKey, {
+        ephemPublicKey: encrypted_document_key_buffer.slice(0, 65),
+        iv: encrypted_document_key_buffer.slice(65, 81),
+        ciphertext: encrypted_document_key_buffer.slice(81, clen),
+        mac: encrypted_document_key_buffer.slice(clen)
+    })
+}
 
 exports.publicKeyConvert = secp256k1.publicKeyConvert;

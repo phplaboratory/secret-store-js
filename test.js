@@ -65,18 +65,9 @@ var hdPrivateKeyBoxItem =   (new HDPrivateKey()).toBuffer() ;
 
     console.log('encrypted_document_key:', encrypted_document_key);
 
-    var encrypted_document_key_buffer = new Buffer(encrypted_document_key,'hex');
-    // const meta_len = 1 + 64 + 16 + 32;
-    let clen = encrypted_document_key_buffer.length - 32;
 
 
-
-   ecies.decrypt(privateKey, {
-       ephemPublicKey: encrypted_document_key_buffer.slice(0,65),
-       iv: encrypted_document_key_buffer.slice(65,81),
-       ciphertext: encrypted_document_key_buffer.slice(81,clen),
-       mac: encrypted_document_key_buffer.slice(clen)
-   }  ).then(function(b) {
+   ecies.decrypt_SecretStore(privateKey, encrypted_document_key  ).then(function(b) {
        console.log("Result A: ",b.toString('hex'));
    });
 
@@ -103,23 +94,13 @@ var encrypted_document_key_B  = JSON.parse(res2.getBody('utf8')).replace('0x', '
 console.log('encrypted_document_key_B:', encrypted_document_key_B);
 
 
-var encrypted_document_key_buffer_B = new Buffer(encrypted_document_key_B,'hex');
-
-let clen_B = encrypted_document_key_buffer_B.length - 32;
-ecies.decrypt(privateKeyB, {
-    ephemPublicKey: encrypted_document_key_buffer_B.slice(0,65),
-    iv: encrypted_document_key_buffer_B.slice(65,81),
-    ciphertext: encrypted_document_key_buffer_B.slice(81,clen_B),
-    mac: encrypted_document_key_buffer_B.slice(clen_B)
-}  ).then(function(b) {
+ecies.decrypt_SecretStore(privateKeyB, encrypted_document_key_B   ).then(function(b) {
     console.log("Result B: ",b.toString('hex'));
 });
 
 
 
-
 // Compose MiraBox
-
 
 // var boxCreatorPrivateKey = new HDPrivateKey('xprv9s21ZrQH143K2QnrsXxnSgWEn8VnQRtyGPGq825BbkuRNCJVYRobFPXGsLnMRmTphziBpyB2synPsWMCTpunVTDjjAtMuXvx2uUbFmhnxgs').derive("m/44'/0'/0'/0").privatekey;
 
