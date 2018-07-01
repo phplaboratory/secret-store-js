@@ -1,6 +1,5 @@
 'use strict';
 
-
 var Promise = require('bluebird');
 var secp256k1 = require('secp256k1/elliptic');
 var crypto = require('crypto');
@@ -19,7 +18,6 @@ function assert(condition, message) {
  */
 function getPublic(privateKey) {
   assert(privateKey.length === 32, "Bad private key");
-  // See https://github.com/wanderer/secp256k1-node/issues/46
   var compressed = secp256k1.publicKeyCreate(privateKey);
   return secp256k1.publicKeyConvert(compressed, false);
 }
@@ -48,16 +46,9 @@ function aes256CbcDecrypt(iv, key, ciphertext) {
 }
 
 function aes128CbcDecrypt(iv, key, ciphertext) {
-
-  // console.log("chiper:",ciphertext);
-  // console.log("iv:",iv);
-
   var cipher = crypto.createDecipheriv("AES-128-CTR", key, iv);
-
   var encoding = encoding || "binary";
-
   var firstChunk = cipher.update(ciphertext);
-  // var firstChunk = cipher.update('','hex',encoding);
   var secondChunk = cipher.final();
   return Buffer.concat([firstChunk, secondChunk]);
 }
@@ -88,32 +79,16 @@ function equalConstTime(b1, b2) {
  */
 function derive(privateKeyA, publicKeyB) {
   return new Promise(function(resolve) {
-
-
-
     var sjcl = require('sjcl-all');
     var mykey = privateKeyA.toString('hex');
     var pubkey = publicKeyB.toString('hex');
     var secret_key_bn = new sjcl.bn(mykey);
-
     var secret_key = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.k256, secret_key_bn);
-
     var pub = new sjcl.ecc.elGamal.publicKey(
         sjcl.ecc.curves.k256,
         sjcl.codec.hex.toBits(pubkey.slice(2))
     );
-
     resolve(new Buffer(sjcl.codec.hex.fromBits( secret_key.dhJavaEc(pub)),'hex' ));
-
-      // console.log("DH Pub: ",publicKeyB.toString('hex'));
-     // console.log("DH Priv:",privateKeyA.toString('hex'));
-    // resolve(secp256k1.ecdh(publicKeyB, privateKeyA));
-
-
-
-
-
-
   });
 }
 
@@ -182,19 +157,10 @@ exports.decrypt = function(privateKey, opts) {
     kdfHash.update(new Buffer([]));
     // hasher.result(&mut dest[written..(written + 32)]);
     var key = kdfHash.digest();
-
-
     var ekey = key.slice(0,16);
     var mkey_material = key.slice(16,32);
     var mkey = sha256(mkey_material);
-
-
-
-    // var hash = sha512(Px);
-    // var encryptionKey = hash.slice(0, 32);
     var encryptionKey = ekey;
-    // var macKey = hash.slice(32);
-    // var macKey = sha256(Px.slice(16));
     var macKey = mkey;
     var dataToMac = Buffer.concat([
       opts.iv,
@@ -202,10 +168,8 @@ exports.decrypt = function(privateKey, opts) {
       opts.ciphertext, new Buffer('0000','hex')
     ]);
     var realMac = hmacSha256(macKey, dataToMac);
-    // console.log(realMac,opts.mac);
     assert(equalConstTime(opts.mac, realMac), "Bad MAC");
     return aes128CbcDecrypt(opts.iv, encryptionKey, opts.ciphertext);
-    // return true;
   });
 };
 
